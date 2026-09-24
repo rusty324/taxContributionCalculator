@@ -172,11 +172,11 @@
           </label>
           <label class="field">Other Colorado additions
             <input name="coOtherAdditions" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
-            <small>e.g. non-Colorado municipal bond interest, QBI add-back.</small>
+            <small>e.g. non-Colorado municipal bond interest, or the QBI add-back if your AGI is over $500k single or $1M joint.</small>
           </label>
           <label class="field">Colorado subtractions
             <input name="coSubtractions" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
-            <small>Pension/Social Security (55+), CollegeInvest 529 contributions, US government bond interest, etc.</small>
+            <small>Social Security, pension &amp; annuity (by age), US government bond interest, state tax refunds reported federally, military retirement, CollegeInvest 529 contributions, etc.</small>
           </label>
         </div>
         <p class="hint small">Above $300,000 federal AGI, the Proposition MM add-back of your standard or itemized deduction is applied automatically.</p>
@@ -187,7 +187,7 @@
         <div class="grid">
           <label class="field">Colorado credits
             <input name="coCredits" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
-            <small>Colorado child tax credit, family affordability credit, Colorado EITC, etc. Include any TABOR refund you expect on the return.</small>
+            <small>Colorado child tax credit (including the family affordability portion), Colorado EITC, care worker credit, etc. Include any TABOR sales-tax refund you expect on the return.</small>
           </label>
           <label class="field">Colorado estimated payments this year
             <input name="coEstimatedPayments" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
@@ -228,7 +228,7 @@
         <li>The Step 3 suggestion (used when you're over-withheld and have no Step 4(c) extra left to remove) is exact under the IRS percentage method: each $1 of Step 3 lowers withholding by $1 ÷ pay periods per year.</li>
         <li>Not modeled: state tax, the refundable Additional Child Tax Credit, the earned income credit, the QBI deduction, AMT, capital losses, phase-outs of other credits. Missing QBI and refundable credits makes the estimate conservative (it may suggest slightly more withholding than needed).</li>
         <li>Social Security wages are approximated by taxable wages when computing SE tax, and Medicare wages likewise for the additional Medicare tax.</li>
-        <li><strong>Colorado:</strong> 4.40% of federal taxable income, plus the add-backs and subtractions you enter, the automatic Proposition MM deduction limit above $300k AGI, and the state income tax add-back. Withholding follows the DR 1098 formula: (annualized wages − annual withholding allowance) × 4.40% ÷ pay periods, plus additional withholding. With only a W-4 on file, employers use a $5,500 allowance ($11,000 married filing jointly). Assumes a full-year resident. Credits and subtractions are what you enter; they aren't computed for you.</li>
+        <li><strong>Colorado:</strong> 4.40% of federal taxable income, plus the add-backs and subtractions you enter, the automatic Proposition MM deduction limit above $300k AGI, and the state income tax add-back. Withholding follows the DR 1098 formula: (annualized wages − annual withholding allowance) × 4.40% ÷ pay periods, plus additional withholding. With only a W-4 on file, employers use a $5,500 allowance ($11,000 married filing jointly). Assumes a full-year resident. Credits and subtractions are what you enter; they aren't computed for you. Checked against the 2026 DR 1098, DR 0004 and the January 2026 Colorado Individual Income Tax Guide.</li>
         <li>This is an estimate, not tax advice. For a second opinion use the <a href="https://apps.irs.gov/app/tax-withholding-estimator" rel="noopener">IRS Tax Withholding Estimator</a>.</li>
       </ul>
     </details>
@@ -295,12 +295,12 @@
         <label class="field">Colorado tax withheld year to date
           <input data-co="ytdWithheld" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
         </label>
-        <label class="field">Current DR 0004 additional withholding per paycheck
+        <label class="field">Current DR 0004 Line 3 (additional per paycheck)
           <input data-co="currentExtra" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
         </label>
-        <label class="field">Current DR 0004 annual withholding allowance
+        <label class="field">Current DR 0004 Line 2 (annual allowance)
           <input data-co="currentAllowance" type="number" min="0" step="any" inputmode="decimal" placeholder="blank = infer from paystub">
-          <small>Leave blank if you don't know or never filed a DR 0004.</small>
+          <small>Leave blank if you don't know or never filed a DR 0004. Enter 0 if Line 2 says 0.</small>
         </label>
       </div>
     </fieldset>

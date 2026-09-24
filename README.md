@@ -37,4 +37,6 @@ ES modules don't load from `file://`, so opening `index.html` directly won't wor
 
 Colorado taxable income = federal taxable income + additions (2026 overtime add-back, state income tax add-back, Proposition MM deduction limit above $300k AGI, anything else you enter) − subtractions you enter, taxed at a flat 4.40%. Withholding follows DR 1098: `(annualized wages − annual withholding allowance) × 4.40% ÷ pay periods + additional withholding`. With only a W-4 on file employers use a $5,500 allowance ($11,000 MFJ). If you don't enter your current allowance, it's inferred from your paystub by inverting that formula.
 
+The Colorado rules were checked against the official 2026 documents in `docs/reference/`: DR 1098 (withholding formula, default allowances), DR 0004 (Line 2/3, Table 1), the DR 0004 withholding calculator spreadsheet, and the January 2026 Individual Income Tax Guide (overtime add-back, Prop MM limits, QBI thresholds). `docs/` isn't published to Pages.
+
 Federal items not modeled: state tax, refundable ACTC, EITC, QBI deduction, AMT, capital losses. Tax tables live in `TABLES` in `site/calc.js`; update them each year.

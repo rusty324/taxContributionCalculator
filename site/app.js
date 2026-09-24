@@ -368,8 +368,8 @@ function renderColorado(fed, r) {
   };
   const dr0004 = (rec) => `
     <ul class="rec-list">
-      <li>Annual withholding allowance: <strong class="big">${usd.format(Math.floor(rec.allowance))}</strong>${allowanceNote(rec)}</li>
-      <li>Additional withholding per paycheck: <strong class="big">${perCheck(rec.extra)}</strong>${rec.currentExtra > 0 ? ` <span class="muted">(now ${usd2.format(rec.currentExtra)})</span>` : ''}</li>
+      <li>Line 2, annual withholding allowance: <strong class="big">${usd.format(Math.floor(rec.allowance))}</strong>${allowanceNote(rec)}</li>
+      <li>Line 3, additional withholding per pay period: <strong class="big">${perCheck(rec.extra)}</strong>${rec.currentExtra > 0 ? ` <span class="muted">(now ${usd2.format(rec.currentExtra)})</span>` : ''}</li>
     </ul>`;
 
   let rec = '';
@@ -427,7 +427,8 @@ function renderColorado(fed, r) {
     ${rec}
     ${next}
     <table class="breakdown">${rows}</table>
-    <p class="note">With only a federal W-4 on file, employers withhold as if your allowance were ${usd.format(r.defaultAllowance)}. A DR 0004 overrides that.</p>
+    ${r.table1Allowance !== null ? `<p class="note">For comparison, DR 0004 Table 1 gives a standard allowance of ${usd.format(r.table1Allowance)} per job for your filing status and ${r.jobs.length} job${r.jobs.length === 1 ? '' : 's'}. The number above is tailored to your actual income, deductions and credits.</p>` : ''}
+    <p class="note">If DR 0004 Line 2 is blank or you only filed a W-4, employers use an allowance of ${usd.format(r.defaultAllowance)} (DR 1098 Step 2a). That usually over-withholds.</p>
   `;
 }
 
