@@ -33,6 +33,18 @@ ES modules don't load from `file://`, so opening `index.html` directly won't wor
 4. **Shortfall** = tax + desired refund − projected payments, spread over the chosen job's remaining paychecks and added to its current Step 4(c). If that goes negative, 4(c) is zeroed and the rest becomes a Step 3 amount (the percentage method lowers withholding by Step 3 ÷ pay periods per year per check).
 5. A **"revisit in January"** number reruns the same math for a full year of current paychecks, since a catch-up amount will over-withhold once the new year starts.
 
+## Paystub scanning
+
+Each job card has a **Scan a paystub** button (PDF or photo). `site/scan.js` loads pdf.js (legacy build, for older browsers) or Tesseract.js from jsDelivr on first use; `site/paystub.js` turns the extracted text into field values:
+
+- Lines are split into label + amounts segments, so side-by-side columns work; the last two amounts are taken as current and YTD.
+- Labels are matched against common provider wording (ADP, Workday, Paychex-style); FICA and Colorado FAMLI lines are excluded.
+- Pre-tax deductions come from gross − federal taxable wages when available, else a Workday-style summary table, else a sum of 401(k)/HSA/medical/etc. lines.
+- OCR repairs: O→0, l→1, dropped decimal points, split amounts. Impossible values (e.g. withholding ≥ gross) are dropped.
+- Everything found is shown in a review panel with confidence badges; nothing is applied until the user confirms.
+
+Test fixtures in `test/fixtures/` are synthetic stubs. Don't add real paystubs to the repo.
+
 ## Colorado tab
 
 Colorado taxable income = federal taxable income + additions (2026 overtime add-back, state income tax add-back, Proposition MM deduction limit above $300k AGI, anything else you enter) − subtractions you enter, taxed at a flat 4.40%. Withholding follows DR 1098: `(annualized wages − annual withholding allowance) × 4.40% ÷ pay periods + additional withholding`. With only a W-4 on file employers use a $5,500 allowance ($11,000 MFJ). If you don't enter your current allowance, it's inferred from your paystub by inverting that formula.

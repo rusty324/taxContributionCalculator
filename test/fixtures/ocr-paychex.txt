@@ -1,0 +1,15 @@
+PAYCHEX
+Check Date 09/19/2026  Pay Period 09/06/2026 - 09/19/2026
+EARNINGS  Rate Hours  This Period  YTD
+Salary  2,5OO.00  47,500.00
+TOTAL GROSS  $ 2,500.00  $ 47,500.00
+WITHHOLDINGS  This Period  YTD
+Social Security  155.00  2,945.00
+Medicare  36.25  688.75
+Fed Income Tax  182.10  3,459.90
+CO Income Tax  96.80  1,839,20
+DEDUCTIONS
+401k  125.00  2,375.00
+Roth 401k  50.00  950.00
+Fed Taxable  2,375.00  45,125.00
+NET PAY  1,854.85

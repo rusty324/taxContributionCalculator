@@ -194,3 +194,29 @@ button { font: inherit; cursor: pointer; }
 .btn-inline { background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; font-weight: 600; }
 .hint.small { font-size: 0.8rem; margin: 12px 0 0; }
 .co-job-name { font-weight: 600; }
+
+/* Paystub scanning */
+.scan { margin: -4px 0 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.btn-scan {
+  background: var(--accent-soft); color: var(--accent); border: 1px solid transparent;
+  border-radius: 7px; padding: 6px 12px; font-weight: 600; font-size: 0.88rem;
+}
+.btn-scan:hover { border-color: var(--accent); }
+.btn-scan:disabled { opacity: 0.6; cursor: progress; }
+.scan-status { font-size: 0.8rem; }
+.scan-review {
+  flex-basis: 100%; border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; background: var(--bg); font-size: 0.88rem;
+}
+.scan-review p { margin: 0 0 8px; }
+.scan-table { width: 100%; border-collapse: collapse; margin-bottom: 8px; }
+.scan-table td, .scan-table th { padding: 5px 4px; vertical-align: top; border-top: 1px solid var(--border); }
+.scan-table th { text-align: left; font-weight: 550; }
+.scan-table th small { display: block; font-weight: 400; color: var(--muted); font-size: 0.75rem; overflow-wrap: anywhere; }
+.scan-table td:last-child { width: 40%; }
+.badge { font-size: 0.7rem; font-weight: 600; padding: 1px 6px; border-radius: 99px; margin-left: 4px; white-space: nowrap; }
+.badge.low { background: var(--warn-soft); color: var(--warn-text); }
+.badge.medium { background: var(--accent-soft); color: var(--accent); }
+.scan-actions { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
+.btn-primary { background: var(--accent); color: var(--surface); border: none; border-radius: 7px; padding: 7px 14px; font-weight: 600; }
+.scan-text pre { white-space: pre-wrap; font-size: 0.75rem; max-height: 240px; overflow: auto; background: var(--surface); padding: 8px; border-radius: 6px; }

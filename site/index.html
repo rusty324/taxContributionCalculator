@@ -229,6 +229,7 @@
         <li>Not modeled: state tax, the refundable Additional Child Tax Credit, the earned income credit, the QBI deduction, AMT, capital losses, phase-outs of other credits. Missing QBI and refundable credits makes the estimate conservative (it may suggest slightly more withholding than needed).</li>
         <li>Social Security wages are approximated by taxable wages when computing SE tax, and Medicare wages likewise for the additional Medicare tax.</li>
         <li><strong>Colorado:</strong> 4.40% of federal taxable income, plus the add-backs and subtractions you enter, the automatic Proposition MM deduction limit above $300k AGI, and the state income tax add-back. Withholding follows the DR 1098 formula: (annualized wages − annual withholding allowance) × 4.40% ÷ pay periods, plus additional withholding. With only a W-4 on file, employers use a $5,500 allowance ($11,000 married filing jointly). Assumes a full-year resident. Credits and subtractions are what you enter; they aren't computed for you. Checked against the 2026 DR 1098, DR 0004 and the January 2026 Colorado Individual Income Tax Guide.</li>
+        <li><strong>Paystub scanning</strong> runs entirely in your browser. PDFs with a text layer are read with pdf.js; photos and scanned PDFs use Tesseract OCR. Both libraries are downloaded from jsDelivr the first time you scan; your file is never uploaded. Scanning matches common labels (e.g. "Federal Income Tax", "FITW", "CO State Tax", "Fed Taxable Wages") and assumes the last two amounts on a line are this period and year to date, so always review what it found.</li>
         <li>This is an estimate, not tax advice. For a second opinion use the <a href="https://apps.irs.gov/app/tax-withholding-estimator" rel="noopener">IRS Tax Withholding Estimator</a>.</li>
       </ul>
     </details>
@@ -243,6 +244,12 @@
           <option value="spouse">Spouse's</option>
         </select>
         <button type="button" class="remove-job btn-link" aria-label="Remove job">Remove</button>
+      </div>
+      <div class="scan">
+        <input type="file" class="scan-input" accept="application/pdf,image/*" hidden aria-label="Paystub file">
+        <button type="button" class="btn-scan">Scan a paystub</button>
+        <span class="scan-status muted" aria-live="polite">PDF or photo. It's read in your browser and never uploaded.</span>
+        <div class="scan-review" hidden></div>
       </div>
       <div class="grid">
         <label class="field">Pay frequency

@@ -1,5 +1,6 @@
 import { project, estimateRemainingPeriods, TABLES, TAX_YEAR } from './calc.js';
 import { projectColorado, CO_TABLES } from './colorado.js';
+import { parsePaystub } from './paystub.js';
 
 const STORAGE_KEY = 'w4-check-v1';
 const form = document.getElementById('form');
@@ -49,8 +50,105 @@ function addJob(data = {}) {
     node.remove();
     update();
   });
+  wireScan(node);
   jobsEl.appendChild(node);
   return node;
+}
+
+// ---------- paystub scanning
+
+const SCAN_FIELDS = [
+  ['frequency', 'Pay frequency'],
+  ['grossPerPeriod', 'Gross pay per paycheck'],
+  ['pretaxPerPeriod', 'Pre-tax deductions per paycheck'],
+  ['fedWithheldPerPeriod', 'Federal tax withheld per paycheck'],
+  ['ytdTaxableWages', 'Federal taxable wages YTD'],
+  ['ytdWithheld', 'Federal tax withheld YTD'],
+  ['coWithheldPerPeriod', 'Colorado tax withheld per paycheck'],
+  ['coYtdWithheld', 'Colorado tax withheld YTD'],
+];
+const FREQ_LABELS = { weekly: 'Weekly', biweekly: 'Every 2 weeks', semimonthly: 'Twice a month', monthly: 'Monthly' };
+const CO_FIELD_MAP = { coWithheldPerPeriod: 'withheldPerPeriod', coYtdWithheld: 'ytdWithheld' };
+const SCAN_HINT = "PDF or photo. It's read in your browser and never uploaded.";
+
+function wireScan(node) {
+  const input = node.querySelector('.scan-input');
+  const button = node.querySelector('.btn-scan');
+  const status = node.querySelector('.scan-status');
+  const review = node.querySelector('.scan-review');
+  button.addEventListener('click', () => input.click());
+  input.addEventListener('change', async (e) => {
+    e.stopPropagation();
+    const file = input.files[0];
+    input.value = '';
+    if (!file) return;
+    button.disabled = true;
+    review.hidden = true;
+    try {
+      const { extractText } = await import('./scan.js');
+      const { text, method } = await extractText(file, (msg) => { status.textContent = msg; });
+      const result = parsePaystub(text);
+      status.textContent = SCAN_HINT;
+      showReview(node, review, result, method);
+    } catch (err) {
+      console.error(err);
+      status.textContent = `Couldn't read that file (${err.message || err}). Try a PDF download from your payroll site, or a sharper photo.`;
+    } finally {
+      button.disabled = false;
+    }
+  });
+}
+
+function showReview(node, review, result, method) {
+  const found = SCAN_FIELDS.filter(([k]) => result.fields[k]);
+  const missing = SCAN_FIELDS.filter(([k]) => !result.fields[k]).map(([, label]) => label);
+  const rows = found.map(([key, label]) => {
+    const f = result.fields[key];
+    const input = key === 'frequency'
+      ? `<select data-scan="${key}">${Object.entries(FREQ_LABELS).map(([v, l]) => `<option value="${v}"${v === f.value ? ' selected' : ''}>${l}</option>`).join('')}</select>`
+      : `<input data-scan="${key}" type="number" step="any" inputmode="decimal" value="${f.value}">`;
+    const badge = f.confidence === 'high' ? '' : `<span class="badge ${f.confidence}">${f.confidence === 'low' ? 'check this' : 'likely'}</span>`;
+    return `<tr>
+      <td><input type="checkbox" data-use="${key}" checked aria-label="Use ${esc(label)}"></td>
+      <th scope="row">${esc(label)} ${badge}<small>${esc(f.source || '')}</small></th>
+      <td>${input}</td>
+    </tr>`;
+  }).join('');
+
+  review.innerHTML = `
+    <p class="scan-summary"><strong>Found ${found.length} of ${SCAN_FIELDS.length} fields</strong> ${method === 'ocr' ? '(via text recognition, so double-check every digit)' : '(from the PDF text)'}. Review and edit, then apply.</p>
+    ${found.length ? `<table class="scan-table">${rows}</table>` : ''}
+    ${missing.length ? `<p class="muted">Not found: ${esc(missing.join(', '))}. Enter these by hand.</p>` : ''}
+    <p class="muted">Pay periods left, bonuses and your current W-4 / DR 0004 extras aren't on most stubs, so enter those yourself.</p>
+    <div class="scan-actions">
+      ${found.length ? '<button type="button" class="btn-primary scan-apply">Apply to this job</button>' : ''}
+      <button type="button" class="btn-link scan-cancel">Dismiss</button>
+    </div>
+    <details class="scan-text"><summary>Text read from the stub</summary><pre>${esc(result.lines.join('\n'))}</pre></details>`;
+  review.hidden = false;
+
+  // Keep the review panel's own inputs from triggering recalculation.
+  for (const el of review.querySelectorAll('input, select')) {
+    el.addEventListener('input', (e) => e.stopPropagation());
+    el.addEventListener('change', (e) => e.stopPropagation());
+  }
+  review.querySelector('.scan-cancel').addEventListener('click', () => { review.hidden = true; });
+  review.querySelector('.scan-apply')?.addEventListener('click', () => {
+    const id = node.dataset.id;
+    for (const [key] of found) {
+      if (!review.querySelector(`[data-use="${key}"]`).checked) continue;
+      const value = review.querySelector(`[data-scan="${key}"]`).value;
+      if (CO_FIELD_MAP[key]) {
+        coJobState[id] = { ...(coJobState[id] || {}), [CO_FIELD_MAP[key]]: value };
+        coJobsSignature = ''; // force the Colorado rows to re-render with the new values
+      } else {
+        node.querySelector(`[data-field="${key}"]`).value = value;
+      }
+    }
+    review.hidden = true;
+    node.querySelector('.scan-status').textContent = 'Filled from your paystub. Check the numbers below.';
+    update();
+  });
 }
 
 function readJobs() {

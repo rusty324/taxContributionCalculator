@@ -1,0 +1,16 @@
+Current and YTD Totals
+Gross Pay   Pre Tax Deductions   Employee Taxes   Post Tax Deductions   Net Pay
+Current   4,166.67   450.00   1,012.33   100.00   2,604.34
+YTD   70,833.39   7,650.00   17,209.61   1,700.00   44,273.78
+Pay Period Begin 09/01/2026   Pay Period End 09/15/2026
+Employee Taxes
+Description   Amount   YTD
+OASDI   258.33   4,391.61
+Medicare   60.42   1,027.14
+Federal Withholding   512.40   8,710.80
+State Tax - CO   164.97   2,804.49
+Taxable Wages
+Description   Amount   YTD
+OASDI - Taxable Wages   3,966.67   67,433.39
+Medicare - Taxable Wages   3,966.67   67,433.39
+Federal Withholding - Taxable Wages   3,716.67   63,183.39

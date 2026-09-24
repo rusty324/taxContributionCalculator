@@ -1,0 +1,18 @@
+Acme Widgets LLC
+Eamings Statement Penod Begining DG0L72026 Period Ending: 01472026  Pay Date 09192026
+Earnings                                                            rate        hours             this period               year to date
+Regular                                                       38.4615         80.00                 3076.92                  55,384.56
+Overtime                                                     57.6923           2.00                    11538                    1038.42
+Gross Pay                                                                                               $3,192.30                  56,422.98
+Statutory Deductions
+Federal Income Tax                                                                                -265.12                   477216
+Social Security Tax                                                                                       19154                    3,447.72
+Medicare Tax                                                                                     44.79                    806.34
+CO State Income Tax                                                                           -110.52                  1,989.36
+CO Fami                                                                                          14.37                    258.66
+Other
+401K                                                                                                           19154                    3447.72
+Dental                                                                                                           12.50                       225.00
+Medical                                                                                                          85.00                    1,530.00
+Net Pay                                                                                                   $2,277.92
+Your faders! taxable wages this period are $2 903 26

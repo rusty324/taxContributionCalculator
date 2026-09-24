@@ -1,0 +1,17 @@
+Earnings rate hours this period year to date
+Regular 38.4615 80.00 3,076.92 55,384.56
+Overtime 57.6923 2.00 115.38 1,038.42
+Gross Pay $3,192.30 56,422.98
+Statutory Deductions this period year to date
+Federal Income Tax -265.12 4,772.16
+Social Security Tax -191.54 3,447.72
+Medicare Tax -44.79 806.34
+CO State Income Tax -110.52 1,989.36
+CO Famli -14.37 258.66
+Other
+401K -191.54 3,447.72
+Dental -12.50 225.00
+Medical -85.00 1,530.00
+Net Pay $2,277.92
+Your federal taxable wages this period are $2,903.26
+Period Beginning: 09/01/2026   Period Ending: 09/14/2026
