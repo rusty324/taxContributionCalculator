@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>W-4 Withholding Check</title>
+  <meta name="description" content="Estimate how much to change your W-4 withholding so you don't owe (or over-lend to the IRS) at tax time.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232f6f5e'/%3E%3Ctext x='16' y='22' font-family='system-ui,sans-serif' font-size='15' font-weight='700' fill='white' text-anchor='middle'%3EW4%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="page-header">
+    <div class="wrap">
+      <h1>W-4 Withholding Check</h1>
+      <p class="lede">Project your <span id="tax-year">2026</span> federal tax from your paystubs and see what to put on a new W-4.
+        Everything runs in your browser; nothing is sent anywhere.</p>
+    </div>
+  </header>
+
+  <main class="wrap layout">
+    <form id="form" autocomplete="off" novalidate>
+
+      <section class="card">
+        <h2><span class="step">1</span> Household</h2>
+        <div class="grid">
+          <label class="field span-2">Filing status
+            <select name="filingStatus">
+              <option value="single">Single</option>
+              <option value="mfj">Married filing jointly</option>
+              <option value="mfs">Married filing separately</option>
+              <option value="hoh">Head of household</option>
+            </select>
+          </label>
+          <label class="field">Children under 17
+            <input name="kids" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+          </label>
+          <label class="field">Other dependents
+            <input name="otherDependents" type="number" min="0" step="1" inputmode="numeric" placeholder="0">
+          </label>
+        </div>
+        <div class="checks">
+          <label><input type="checkbox" name="you65"> I'm 65 or older</label>
+          <label><input type="checkbox" name="youBlind"> I'm blind</label>
+          <label class="joint-only"><input type="checkbox" name="spouse65"> Spouse is 65 or older</label>
+          <label class="joint-only"><input type="checkbox" name="spouseBlind"> Spouse is blind</label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">2</span> Jobs</h2>
+        <p class="hint">One entry per W-2 job (yours and your spouse's). Pull the numbers from your most recent paystub.</p>
+        <div id="jobs"></div>
+        <button type="button" id="add-job" class="btn-secondary">+ Add a job</button>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">3</span> Other income <span class="opt">annual, expected for the full year</span></h2>
+        <div class="grid">
+          <label class="field">Interest, ordinary dividends &amp; short-term gains
+            <input name="investOrdinary" type="number" step="any" inputmode="decimal" placeholder="0">
+          </label>
+          <label class="field">Qualified dividends
+            <input name="qualifiedDividends" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Enter only the qualified part here, not in the box to the left.</small>
+          </label>
+          <label class="field">Net long-term capital gains
+            <input name="ltcg" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+          </label>
+          <label class="field">Other taxable income
+            <input name="otherIncome" type="number" step="any" inputmode="decimal" placeholder="0">
+            <small>Unemployment, taxable IRA/pension distributions, taxable Social Security, etc.</small>
+          </label>
+          <label class="field">Net self-employment income
+            <input name="seIncome" type="number" step="any" inputmode="decimal" placeholder="0">
+            <small>Schedule C profit. SE tax is added automatically.</small>
+          </label>
+          <label class="field joint-only">Self-employment belongs to
+            <select name="seOwner"><option value="you">Me</option><option value="spouse">Spouse</option></select>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">4</span> Deductions <span class="opt">annual</span></h2>
+        <div class="grid">
+          <label class="field">Itemized deductions total
+            <input name="itemized" type="number" min="0" step="any" inputmode="decimal" placeholder="0 = use standard">
+            <small>Used only if it beats your standard deduction (<span id="std-ded">$16,100</span>).</small>
+          </label>
+          <label class="field">Adjustments to income
+            <input name="adjustments" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Traditional IRA, student loan interest, HSA contributions made outside payroll.</small>
+          </label>
+          <label class="field span-2">Other deductions allowed with the standard deduction
+            <input name="otherDeductions" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Qualified tips, overtime premium, car-loan interest (2025–2028 deductions). Enter the amount after their own limits. The 65+ deduction is handled automatically.</small>
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">5</span> Credits &amp; payments</h2>
+        <div class="grid">
+          <label class="field">Other nonrefundable credits
+            <input name="otherCredits" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Education, child care, energy credits, etc. Child credits are computed from step 1.</small>
+          </label>
+          <label class="field">Estimated tax payments this year
+            <input name="estimatedPayments" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Already made plus any still planned.</small>
+          </label>
+          <label class="field">Last year's total tax <span class="opt">optional</span>
+            <input name="priorYearTax" type="number" min="0" step="any" inputmode="decimal" placeholder="Form 1040, line 24">
+            <small>Used to check the underpayment-penalty safe harbor.</small>
+          </label>
+          <label class="field">Last year's AGI <span class="opt">optional</span>
+            <input name="priorYearAgi" type="number" min="0" step="any" inputmode="decimal" placeholder="Form 1040, line 11">
+          </label>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2><span class="step">6</span> Goal</h2>
+        <div class="grid">
+          <label class="field">Refund I want at tax time
+            <input name="targetRefund" type="number" step="any" inputmode="decimal" placeholder="0">
+            <small>0 = break even. A negative number means you're fine owing that much.</small>
+          </label>
+          <label class="field">Put the change on
+            <select name="adjustJobIndex" id="adjust-job"></select>
+          </label>
+        </div>
+      </section>
+
+      <p class="form-actions">
+        <button type="button" id="reset" class="btn-link">Clear all inputs</button>
+      </p>
+    </form>
+
+    <aside class="results" aria-live="polite">
+      <div class="card sticky" id="results"></div>
+    </aside>
+  </main>
+
+  <footer class="wrap page-footer">
+    <details>
+      <summary>What this does and doesn't model</summary>
+      <ul>
+        <li>Uses <span class="ty">2026</span> federal brackets, standard deduction, child tax credit ($2,200), 0/15/20% capital gains bands, self-employment tax, additional Medicare tax, net investment income tax and the 65+ senior deduction.</li>
+        <li>Wages for the rest of the year are your current paycheck × remaining pay periods, plus any bonuses you list. Bonuses are assumed withheld at the 22% supplemental rate.</li>
+        <li>The Step 3 suggestion (used when you're over-withheld and have no Step 4(c) extra left to remove) is exact under the IRS percentage method: each $1 of Step 3 lowers withholding by $1 ÷ pay periods per year.</li>
+        <li>Not modeled: state tax, the refundable Additional Child Tax Credit, the earned income credit, the QBI deduction, AMT, capital losses, phase-outs of other credits. Missing QBI and refundable credits makes the estimate conservative (it may suggest slightly more withholding than needed).</li>
+        <li>Social Security wages are approximated by taxable wages when computing SE tax, and Medicare wages likewise for the additional Medicare tax.</li>
+        <li>This is an estimate, not tax advice. For a second opinion use the <a href="https://apps.irs.gov/app/tax-withholding-estimator" rel="noopener">IRS Tax Withholding Estimator</a>.</li>
+      </ul>
+    </details>
+  </footer>
+
+  <template id="job-template">
+    <fieldset class="job">
+      <div class="job-head">
+        <input data-field="label" class="job-label" type="text" placeholder="Employer name" aria-label="Employer name">
+        <select data-field="owner" class="joint-only" aria-label="Whose job">
+          <option value="you">Mine</option>
+          <option value="spouse">Spouse's</option>
+        </select>
+        <button type="button" class="remove-job btn-link" aria-label="Remove job">Remove</button>
+      </div>
+      <div class="grid">
+        <label class="field">Pay frequency
+          <select data-field="frequency">
+            <option value="weekly">Weekly (52)</option>
+            <option value="biweekly" selected>Every 2 weeks (26)</option>
+            <option value="semimonthly">Twice a month (24)</option>
+            <option value="monthly">Monthly (12)</option>
+          </select>
+        </label>
+        <label class="field">Pay periods left this year
+          <input data-field="remainingPeriods" type="number" min="0" step="1" inputmode="numeric">
+          <small class="remaining-hint">Leave blank to estimate from today's date.</small>
+        </label>
+        <label class="field">Gross pay per paycheck
+          <input data-field="grossPerPeriod" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+        </label>
+        <label class="field">Pre-tax deductions per paycheck
+          <input data-field="pretaxPerPeriod" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+          <small>Traditional 401(k)/403(b), HSA, FSA, health premiums.</small>
+        </label>
+        <label class="field">Federal income tax withheld per paycheck
+          <input data-field="fedWithheldPerPeriod" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+          <small>Federal only, not Social Security or Medicare.</small>
+        </label>
+        <label class="field">Current W-4 Step 4(c) extra per paycheck
+          <input data-field="current4c" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+        </label>
+        <label class="field">Federal taxable wages year to date
+          <input data-field="ytdTaxableWages" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+          <small>Often "Fed taxable gross" YTD. If missing: YTD gross − YTD pre-tax deductions.</small>
+        </label>
+        <label class="field">Federal tax withheld year to date
+          <input data-field="ytdWithheld" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+        </label>
+        <label class="field span-2">Bonuses still expected this year (gross)
+          <input data-field="bonusRemaining" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+        </label>
+      </div>
+    </fieldset>
+  </template>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
