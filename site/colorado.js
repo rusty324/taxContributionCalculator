@@ -1,12 +1,21 @@
 // Colorado income tax + DR 0004 withholding projection. Builds on the federal
 // projection from calc.js: Colorado taxable income starts from federal taxable income.
+// Sources (docs/reference/): DR 1098 (10/21/25), DR 0004 (10/29/25), and the
+// Colorado Individual Income Tax Guide (Jan 2026).
 
 export const CO_TABLES = {
   rate: 0.044,
-  // DR 1098 (2026): allowance an employer uses when only a federal W-4 is on file.
+  // DR 1098 Step 2a: allowance an employer uses when DR 0004 Line 2 is blank.
   w4DefaultAllowance: { mfj: 11000, other: 5500 },
-  // Proposition MM (2026+): above this federal AGI, the federal standard/itemized
-  // deduction is limited to these amounts; the excess is added back.
+  // DR 0004 Table 1: standard allowance per job, indexed by number of jobs (1, 2, 3, 4+).
+  table1Allowance: {
+    single: [14000, 7000, 4500, 3500],
+    mfs: [14000, 7000, 4500, 3500],
+    hoh: [22000, 11000, 7500, 5500],
+    mfj: [30000, 15000, 10000, 7500],
+  },
+  // Income Tax Guide Part 3 (Proposition MM, 2026+): above this federal AGI, the federal
+  // standard/itemized deduction is limited to these amounts; the excess is added back.
   deductionLimitAgi: 300000,
   deductionLimit: { mfj: 2000, other: 1000 },
 };
@@ -28,6 +37,8 @@ export function coloradoLiability(fed, status, co) {
     ? Math.min(pos(co.stateIncomeTaxItemized), Math.max(0, fed.itemized - fed.standard))
     : 0;
 
+  // The guide doesn't say how this coordinates with the state income tax addback; we
+  // assume the two together can't add back more than (deduction - limit).
   const limit = joint ? CO_TABLES.deductionLimit.mfj : CO_TABLES.deductionLimit.other;
   const deductionAddback = fed.agi > CO_TABLES.deductionLimitAgi
     ? Math.max(0, baseDeduction - stateTaxAddback - limit)
@@ -50,8 +61,8 @@ export function coloradoLiability(fed, status, co) {
   };
 }
 
-// Allowance currently in effect, backed out of the paystub if not given:
-// withheld = (annualWages - allowance) * rate / P + extra
+// Allowance currently in effect, backed out of the paystub if not given, by inverting
+// DR 1098 Step 2: withheld = max(0, annualWages - allowance) * rate / P + extra
 export function impliedAllowance(job, coJob, rate) {
   if (Number.isFinite(coJob.currentAllowance)) return Math.max(0, coJob.currentAllowance);
   const P = job.periodsPerYear;
@@ -117,7 +128,9 @@ export function projectColorado(fedResult, status, co) {
 
   const jobs = fedResult.jobs.map((j) => {
     const cj = co.jobs?.[j.id] || {};
-    const bonusWithholding = pos(j.bonusRemaining) * rate; // supplemental wages withheld at the flat rate
+    // DR 1098 has no separate supplemental rate: a bonus is annualized with the paycheck,
+    // so once regular wages exceed the allowance it adds bonus * rate.
+    const bonusWithholding = pos(j.bonusRemaining) * rate;
     const annualWithheld = pos(cj.ytdWithheld) + pos(cj.withheldPerPeriod) * j.remaining + bonusWithholding;
     return { job: j, co: cj, annualWithheld, steadyWithheld: pos(cj.withheldPerPeriod) * j.periodsPerYear };
   });
@@ -147,9 +160,12 @@ export function projectColorado(fedResult, status, co) {
     };
   }
 
+  const table1 = CO_TABLES.table1Allowance[status] || CO_TABLES.table1Allowance.single;
+  const table1Allowance = jobs.length ? table1[Math.min(jobs.length, 4) - 1] : null;
+
   return {
     liability, jobs, withheld, estimated, payments, balance, target, shortfall,
-    adjustIdx: idx, thisYear, nextYear,
+    adjustIdx: idx, thisYear, nextYear, table1Allowance,
     defaultAllowance: status === 'mfj' ? CO_TABLES.w4DefaultAllowance.mfj : CO_TABLES.w4DefaultAllowance.other,
   };
 }

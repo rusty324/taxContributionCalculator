@@ -80,3 +80,11 @@ test('over-withheld: extra removed first, then allowance raised', () => {
   assert.equal(co.thisYear.extra, 0);
   close(co.thisYear.allowance, 5500 + ((reduce - 20) * 26) / 0.044);
 });
+
+test('DR 0004 Table 1 reference allowance by status and number of jobs', () => {
+  const job = (id) => ({ id, frequency: 'biweekly', grossPerPeriod: 3000, remainingPeriods: 0 });
+  const fed2 = project({ filingStatus: 'mfj', jobs: [job('a'), job('b')] });
+  assert.equal(projectColorado(fed2, 'mfj', {}).table1Allowance, 15000);
+  const fed5 = project({ filingStatus: 'hoh', jobs: ['a', 'b', 'c', 'd', 'e'].map(job) });
+  assert.equal(projectColorado(fed5, 'hoh', {}).table1Allowance, 5500);
+});
