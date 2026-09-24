@@ -178,3 +178,19 @@ button { font: inherit; cursor: pointer; }
 .page-footer summary { cursor: pointer; color: var(--text); font-weight: 550; }
 .page-footer ul { padding-left: 18px; max-width: 80ch; }
 .page-footer a { color: var(--accent); }
+
+/* Tabs */
+.tabs { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
+.tabs [role="tab"] {
+  background: none; border: none; border-bottom: 2px solid transparent;
+  color: var(--muted); font-weight: 600; padding: 10px 14px; margin-bottom: -1px;
+}
+.tabs [role="tab"] span { font-weight: 400; font-size: 0.85em; margin-left: 4px; }
+.tabs [role="tab"]:hover { color: var(--text); }
+.tabs [role="tab"][aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+[role="tabpanel"][hidden] { display: none; }
+
+.intro { font-size: 0.92rem; }
+.btn-inline { background: none; border: none; padding: 0; color: var(--accent); text-decoration: underline; font-weight: 600; }
+.hint.small { font-size: 0.8rem; margin: 12px 0 0; }
+.co-job-name { font-weight: 600; }
