@@ -20,6 +20,18 @@ function loadPdfjs() {
   return pdfjsPromise;
 }
 
+// page.getTextContent() iterates a ReadableStream with `for await`, which Safari doesn't
+// support. Read the same stream with a plain reader instead.
+async function readTextItems(page) {
+  const reader = page.streamTextContent().getReader();
+  const items = [];
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) return items;
+    items.push(...value.items);
+  }
+}
+
 const isPdf = (file) => file.type === 'application/pdf' || /\.pdf$/i.test(file.name);
 
 // Upscale small images and convert to high-contrast grayscale, which helps OCR on photos.
@@ -84,8 +96,7 @@ export async function extractText(file, onStatus = () => {}) {
   const lines = [];
   for (let n = 1; n <= pages; n++) {
     const page = await pdf.getPage(n);
-    const content = await page.getTextContent();
-    lines.push(...itemsToLines(content.items));
+    lines.push(...itemsToLines(await readTextItems(page)));
   }
   if (lines.join('').replace(/\s/g, '').length > 40) return { text: lines.join('\n'), method: 'pdf' };
 
