@@ -134,8 +134,10 @@ export function computeLiability(p) {
   const qualDiv = pos(p.qualifiedDividends);
   const ltcg = pos(p.ltcg);
   const otherIncome = nz(p.otherIncome);
+  // Colorado FAMLI benefits: federally taxable (Form 1099-G), not wages, not investment income.
+  const famliBenefits = pos(p.famliBenefits);
 
-  const totalIncome = wages + investOrdinary + qualDiv + ltcg + otherIncome + se;
+  const totalIncome = wages + investOrdinary + qualDiv + ltcg + otherIncome + famliBenefits + se;
   const agi = Math.max(0, totalIncome - halfSeTax - pos(p.adjustments));
 
   // Deductions
@@ -174,7 +176,7 @@ export function computeLiability(p) {
   const total = incomeTaxAfterCredits + seTax + addlMedicare + niit;
 
   return {
-    wages, totalIncome, agi, standard, itemized, usesItemized, seniorDeduction, otherDeductions,
+    wages, famliBenefits, totalIncome, agi, standard, itemized, usesItemized, seniorDeduction, otherDeductions,
     totalDeductions, taxable,
     ordinaryTax: it.ordinaryTax, preferentialTax: it.preferentialTax, incomeTax: it.tax,
     dependentCredits, credits, creditsUnused, incomeTaxAfterCredits,
@@ -257,8 +259,9 @@ export function project(input, today = new Date()) {
   const liability = computeLiability({ ...common, wages: sumWages('annualWages') });
   const withheld = jobs.reduce((s, j) => s + j.annualWithheld, 0);
   const addlMedicareWithheld = jobs.reduce((s, j) => s + j.employerAddlMedicare, 0);
+  const famliWithheld = pos(input.famliFedWithheld);
   const estimated = pos(input.estimatedPayments);
-  const payments = withheld + addlMedicareWithheld + estimated;
+  const payments = withheld + famliWithheld + addlMedicareWithheld + estimated;
   const balance = payments - liability.total; // + refund, - owed
   const target = nz(input.targetRefund);
   const shortfall = liability.total + target - payments;
@@ -289,7 +292,8 @@ export function project(input, today = new Date()) {
   // ---- Steady state: a full year of current paychecks, no bonuses
   let nextYear = null;
   if (jobs.length) {
-    const steadyLiability = computeLiability({ ...common, wages: sumWages('steadyWages') });
+    // Leave benefits are treated as a one-off, so they're left out of next year's picture.
+    const steadyLiability = computeLiability({ ...common, famliBenefits: 0, wages: sumWages('steadyWages') });
     const steadyPayments = jobs.reduce((s, j) => s + j.steadyWithheld + employerAddlMedicare(j.steadyWages), 0);
     const steadyShortfall = steadyLiability.total + target - steadyPayments;
     nextYear = {
@@ -301,7 +305,7 @@ export function project(input, today = new Date()) {
   }
 
   return {
-    jobs, liability, withheld, addlMedicareWithheld, estimated, payments, balance, target,
+    jobs, liability, withheld, famliWithheld, addlMedicareWithheld, estimated, payments, balance, target,
     shortfall, adjustIdx, thisYear, safeHarbor, nextYear,
   };
 }

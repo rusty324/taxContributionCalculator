@@ -88,3 +88,23 @@ test('DR 0004 Table 1 reference allowance by status and number of jobs', () => {
   const fed5 = project({ filingStatus: 'hoh', jobs: ['a', 'b', 'c', 'd', 'e'].map(job) });
   assert.equal(projectColorado(fed5, 'hoh', {}).table1Allowance, 5500);
 });
+
+test('FAMLI benefits: taxed federally, subtracted for Colorado, excluded from next year', () => {
+  const input = {
+    filingStatus: 'single',
+    famliBenefits: 5000,
+    famliFedWithheld: 500,
+    jobs: [{ id: 'a', frequency: 'biweekly', grossPerPeriod: 4000, fedWithheldPerPeriod: 400,
+      ytdTaxableWages: 72000, ytdWithheld: 7200, remainingPeriods: 8 }],
+  };
+  const fed = project(input);
+  // wages 104,000 + 5,000 FAMLI - 16,100 = 92,900 taxable
+  assert.equal(fed.liability.taxable, 92900);
+  assert.equal(fed.famliWithheld, 500);
+  assert.equal(fed.payments, 7200 + 400 * 8 + 500);
+  assert.equal(fed.nextYear.liability.taxable, 87900);
+  const co = projectColorado(fed, 'single', { jobs: {} });
+  assert.equal(co.liability.famliSubtraction, 5000);
+  close(co.liability.taxable, 87900);
+  assert.equal(co.nextYear.liability.famliSubtraction, 0);
+});
