@@ -15,11 +15,11 @@ export function parseMoney(token) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-// Common OCR confusions inside numeric tokens.
+// Common OCR confusions inside numeric tokens. (No regex lookbehind: older Safari lacks it.)
 function cleanToken(tok) {
-  if (!/\d/.test(tok)) return tok;
-  let t = tok.replace(/[Oo](?=[\d,.])|(?<=[\d,.])[Oo]/g, '0').replace(/(?<=\d)[lI|]|[lI|](?=\d)/g, '1');
-  t = t.replace(/(?<=\d),(?=\d{2}$)/, '.'); // "1,234,56" -> "1,234.56"
+  if (!/\d/.test(tok) || !/^[-($\dOoIl|,.)]+$/.test(tok)) return tok;
+  let t = tok.replace(/[Oo]/g, '0').replace(/[lI|]/g, '1');
+  t = t.replace(/(\d),(\d{2})$/, '$1.$2'); // "1,234,56" -> "1,234.56"
   return t;
 }
 
