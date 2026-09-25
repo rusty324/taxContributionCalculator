@@ -76,6 +76,14 @@
             <input name="otherIncome" type="number" step="any" inputmode="decimal" placeholder="0">
             <small>Unemployment, taxable IRA/pension distributions, taxable Social Security, etc.</small>
           </label>
+          <label class="field">Colorado FAMLI benefits received
+            <input name="famliBenefits" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Total paid (and still expected) this year, from Form 1099-G or your FAMLI account. Taxed federally; subtracted automatically on the Colorado tab.</small>
+          </label>
+          <label class="field">Federal tax withheld from FAMLI benefits
+            <input name="famliFedWithheld" type="number" min="0" step="any" inputmode="decimal" placeholder="0">
+            <small>Only if you opted in to 10% withholding. Most people didn't.</small>
+          </label>
           <label class="field">Net self-employment income
             <input name="seIncome" type="number" step="any" inputmode="decimal" placeholder="0">
             <small>Schedule C profit. SE tax is added automatically.</small>

@@ -47,7 +47,11 @@ export function coloradoLiability(fed, status, co) {
   const overtimeAddback = pos(co.overtimeAddback);
   const otherAdditions = pos(co.otherAdditions);
   const additions = stateTaxAddback + deductionAddback + overtimeAddback + otherAdditions;
-  const subtractions = pos(co.subtractions);
+  // FAMLI benefits included in federal taxable income are exempt from Colorado tax
+  // (rule 39-22-104(2)-1; DR 0104AD).
+  const famliSubtraction = pos(fed.famliBenefits);
+  const otherSubtractions = pos(co.subtractions);
+  const subtractions = famliSubtraction + otherSubtractions;
 
   const taxable = Math.max(0, fed.taxable + additions - subtractions);
   const tax = taxable * rate;
@@ -57,7 +61,7 @@ export function coloradoLiability(fed, status, co) {
 
   return {
     federalTaxable: fed.taxable, stateTaxAddback, deductionAddback, overtimeAddback, otherAdditions,
-    additions, subtractions, taxable, rate, tax, credits, total,
+    additions, famliSubtraction, otherSubtractions, subtractions, taxable, rate, tax, credits, total,
   };
 }
 
